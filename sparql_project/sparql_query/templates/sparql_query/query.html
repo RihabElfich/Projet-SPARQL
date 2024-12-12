@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARQL Query</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 2em;
+        }
+
+        /* Form styles */
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-left: 260px;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Result list styles */
+        ul {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        ul li {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        ul li strong {
+            color: #2c3e50;
+        }
+
+        /* Error message styles */
+        p {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enter SPARQL Query</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if response_data %}
+    <h2>Results</h2>
+    <ul>
+        {% if response_data.results %}
+            {% for result in response_data.results %}
+                <li>
+                    {% for key, value in result.items %}
+                        <strong>{{ key|capfirst }}:</strong> {{ value }}<br>
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        {% else %}
+            <p>{{ response_data.error }}</p>
+        {% endif %}
+    </ul>
+    {% endif %}
+</body>
+</html>

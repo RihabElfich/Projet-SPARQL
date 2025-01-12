@@ -1,0 +1,296 @@
+@prefix : <http://www.semanticweb.org/poste/ontologies/2025/0/libraryOntology/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/poste/ontologies/2025/0/libraryOntology/> .
+
+<http://www.semanticweb.org/poste/ontologies/2025/0/libraryOntology> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+:belongsToGenre rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf owl:topObjectProperty ;
+                rdfs:domain :Book ;
+                rdfs:range :Genre .
+
+:hasBorrowing rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain :Reader ;
+              rdfs:range :Borrowing .
+
+:isBorrowedBy rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf owl:topObjectProperty ;
+              rdfs:domain :Book ;
+              rdfs:range :Borrowing .
+
+:isWrittenBy rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf owl:topObjectProperty ;
+             rdfs:domain :Book ;
+             rdfs:range :Author .
+
+#################################################################
+#    Data properties
+#################################################################
+
+:hasBorrowingDate rdf:type owl:DatatypeProperty ;
+                  rdfs:subPropertyOf owl:topDataProperty ;
+                  rdfs:domain :Borrowing ;
+                  rdfs:range xsd:dateTime .
+
+:hasName rdf:type owl:DatatypeProperty ;
+         rdfs:subPropertyOf owl:topDataProperty ;
+         rdfs:domain :Author ,
+                     :Genre ,
+                     :Reader ;
+         rdfs:range xsd:string .
+
+:hasTitle rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :Book ;
+          rdfs:range xsd:string .
+
+#################################################################
+#    Classes
+#################################################################
+
+:Author rdf:type owl:Class .
+
+:Book rdf:type owl:Class .
+
+:Borrowing rdf:type owl:Class .
+
+:Genre rdf:type owl:Class .
+
+:Reader rdf:type owl:Class .
+
+#################################################################
+#    Individuals
+#################################################################
+
+# Auteurs
+:author01 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Jane Austen" .
+
+:author02 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Charles Dickens" .
+
+:author03 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Herman Melville" .
+
+:author04 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "George Orwell" .
+
+:author05 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "J.K. Rowling" .
+
+:author06 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Mark Twain" .
+
+:author07 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "F. Scott Fitzgerald" .
+
+:author08 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Ernest Hemingway" .
+
+:author09 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Leo Tolstoy" .
+
+:author10 rdf:type owl:NamedIndividual ,
+                   :Author ;
+          :hasName "Virginia Woolf" .
+
+# Livres
+:book01 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre01 ;
+        :isWrittenBy :author01 ;
+        :hasTitle "Pride and Prejudice" .
+
+:book02 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre01 ;
+        :isWrittenBy :author02 ;
+        :hasTitle "Oliver Twist" .
+
+:book03 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre02 ;
+        :isWrittenBy :author03 ;
+        :hasTitle "Moby Dick" .
+
+:book04 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre03 ;
+        :isWrittenBy :author04 ;
+        :hasTitle "1984" .
+
+:book05 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre01 ;
+        :isWrittenBy :author05 ;
+        :hasTitle "Harry Potter and the Sorcerer's Stone" .
+
+:book06 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre02 ;
+        :isWrittenBy :author06 ;
+        :hasTitle "The Adventures of Tom Sawyer" .
+
+:book07 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre03 ;
+        :isWrittenBy :author07 ;
+        :hasTitle "The Great Gatsby" .
+
+:book08 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre04 ;
+        :isWrittenBy :author08 ;
+        :hasTitle "The Old Man and the Sea" .
+
+:book09 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre01 ;
+        :isWrittenBy :author09 ;
+        :hasTitle "War and Peace" .
+
+:book10 rdf:type owl:NamedIndividual ,
+                 :Book ;
+        :belongsToGenre :genre02 ;
+        :isWrittenBy :author10 ;
+        :hasTitle "Mrs. Dalloway" .
+
+# Genres
+:genre01 rdf:type owl:NamedIndividual ,
+                  :Genre ;
+         :hasName "Romance" .
+
+:genre02 rdf:type owl:NamedIndividual ,
+                  :Genre ;
+         :hasName "Adventure" .
+
+:genre03 rdf:type owl:NamedIndividual ,
+                  :Genre ;
+         :hasName "Classic" .
+
+:genre04 rdf:type owl:NamedIndividual ,
+                  :Genre ;
+         :hasName "Literary Fiction" .
+
+# Lecteurs
+:reader01 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Nouhaila" .
+
+:reader02 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Amine" .
+
+:reader03 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Sami" .
+
+:reader04 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Sophie" .
+
+:reader05 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Ali" .
+
+:reader06 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Sarah" .
+
+:reader07 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "John" .
+
+:reader08 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Marwa" .
+
+:reader09 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "David" .
+
+:reader10 rdf:type owl:NamedIndividual ,
+                   :Reader ;
+          :hasName "Rania" .
+
+# Emprunts
+:borrowing01 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-11T14:30:00.000"^^xsd:dateTime .
+
+:borrowing02 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-12T09:00:00.000"^^xsd:dateTime .
+
+:borrowing03 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-15T11:15:00.000"^^xsd:dateTime .
+
+:borrowing04 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-16T13:45:00.000"^^xsd:dateTime .
+
+:borrowing05 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-17T10:00:00.000"^^xsd:dateTime .
+
+:borrowing06 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-18T15:30:00.000"^^xsd:dateTime .
+
+:borrowing07 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-19T09:30:00.000"^^xsd:dateTime .
+
+:borrowing08 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-20T14:00:00.000"^^xsd:dateTime .
+
+:borrowing09 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-21T11:15:00.000"^^xsd:dateTime .
+
+:borrowing10 rdf:type owl:NamedIndividual ,
+                      :Borrowing ;
+             :hasBorrowingDate "2025-01-22T12:00:00.000"^^xsd:dateTime .
+
+# Attribuer les emprunts aux lecteurs et livres
+:reader01 :hasBorrowing :borrowing01 .
+:reader02 :hasBorrowing :borrowing02 .
+:reader03 :hasBorrowing :borrowing03 .
+:reader04 :hasBorrowing :borrowing04 .
+:reader05 :hasBorrowing :borrowing05 .
+:reader06 :hasBorrowing :borrowing06 .
+:reader07 :hasBorrowing :borrowing07 .
+:reader08 :hasBorrowing :borrowing08 .
+:reader09 :hasBorrowing :borrowing09 .
+:reader10 :hasBorrowing :borrowing10 .
+
+:book01 :isBorrowedBy :borrowing01 .
+:book02 :isBorrowedBy :borrowing02 .
+:book03 :isBorrowedBy :borrowing03 .
+:book04 :isBorrowedBy :borrowing04 .
+:book05 :isBorrowedBy :borrowing05 .
+:book06 :isBorrowedBy :borrowing06 .
+:book07 :isBorrowedBy :borrowing07 .
+:book08 :isBorrowedBy :borrowing08 .
+:book09 :isBorrowedBy :borrowing09 .
+:book10 :isBorrowedBy :borrowing10 .

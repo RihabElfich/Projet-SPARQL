@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,8 @@
             color: #333;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             text-align: center;
             color: #2c3e50;
         }
@@ -55,24 +57,37 @@
             background-color: #2980b9;
         }
 
-        /* Result list styles */
-        ul {
-            max-width: 800px;
+        /* Table styles */
+        table {
+            width: 80%;
             margin: 30px auto;
-            padding: 0;
-            list-style-type: none;
+            border-collapse: collapse;
         }
 
-        ul li {
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
         }
 
-        ul li strong {
-            color: #2c3e50;
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        td a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
         }
 
         /* Error message styles */
@@ -83,6 +98,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Enter SPARQL Query</h1>
     <form method="post">
@@ -93,19 +109,39 @@
 
     {% if response_data %}
     <h2>Results</h2>
-    <ul>
-        {% if response_data.results %}
-            {% for result in response_data.results %}
-                <li>
-                    {% for key, value in result.items %}
-                        <strong>{{ key|capfirst }}:</strong> {{ value }}<br>
-                    {% endfor %}
-                </li>
+    <table>
+        <thead>
+            <tr>
+                {% for var in response_data.head.vars %}
+                <th>{{ var|capfirst }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% if response_data.results.bindings %}
+            {% for result in response_data.results.bindings %}
+            <tr>
+                {% for key, value in result.items %}
+                <td>
+                    {% if value.type == 'uri' %}
+                    <a href="{{ value.value }}" target="_blank">{{ value.value }}</a>
+                    {% else %}
+                    {{ value.value }}
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        {% else %}
-            <p>{{ response_data.error }}</p>
-        {% endif %}
-    </ul>
+            {% else %}
+            <tr>
+                <td colspan="{{ response_data.head.vars|length }}">No results found</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>{{ response_data.error }}</p>
     {% endif %}
 </body>
+
 </html>

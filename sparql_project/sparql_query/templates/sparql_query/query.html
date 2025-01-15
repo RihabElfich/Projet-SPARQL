@@ -96,7 +96,20 @@
             text-align: center;
             font-size: 1.2em;
         }
+        #graph-container {
+            width: 100%;
+            height: 80vh; /* Utiliser 80% de la hauteur de la fenêtre */
+            overflow: auto; /* Ajout d'une barre de défilement si nécessaire */
+            margin-top: 20px;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
     </style>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 
 <body>
@@ -106,20 +119,27 @@
         {{ form.as_p }}
         <button type="submit">Submit</button>
     </form>
-
-    {% if response_data %}
+    <div style="margin-top: 20px; display: flex; justify-content: center; align-items: center; height: 100px;">
+        <a href="http://127.0.0.1:8000/query/visualiser-graphe/" 
+           class="btn" 
+           style="background-color: #007BFF; color: white; padding: 10px 20px; font-size: 16px; border-radius: 5px; text-decoration: none;">
+            Visualiser le Graphe RDF 
+        </a>
+    </div>
+    {% if sparql_results %}
     <h2>Results</h2>
+   
     <table>
         <thead>
             <tr>
-                {% for var in response_data.head.vars %}
+                {% for var in sparql_results.head.vars %}
                 <th>{{ var|capfirst }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
-            {% if response_data.results.bindings %}
-            {% for result in response_data.results.bindings %}
+            {% if sparql_results.results.bindings %}
+            {% for result in sparql_results.results.bindings %}
             <tr>
                 {% for key, value in result.items %}
                 <td>
@@ -134,14 +154,167 @@
             {% endfor %}
             {% else %}
             <tr>
-                <td colspan="{{ response_data.head.vars|length }}">No results found</td>
+                <td colspan="{{ sparql_results.head.vars|length }}">No results found</td>
             </tr>
             {% endif %}
         </tbody>
     </table>
     {% else %}
-    <p>{{ response_data.error }}</p>
+    <p>{{ sparql_results.error }}</p>
     {% endif %}
+    {% if sparql_results %}
+    <h2>Résultats du Graphe</h2>
+    <svg width="960" height="900"></svg>
+    <script>
+         const sparqlResults = {{ sparql_results | safe }}; 
+    
+        // Créez un objet pour les nœuds et les arêtes du graphe
+        const nodes = [];
+        const edges = [];
+        const nodesSet = new Set();  // Pour éviter les doublons
+    
+        // Fonction pour extraire la partie finale de l'URI
+        function extractLastPart(uri) {
+            const parts = uri.split('/');
+            return parts[parts.length - 1];
+        }
+    
+        // Traitez les résultats SPARQL pour créer des nœuds et des arêtes
+        sparqlResults.results.bindings.forEach(result => {
+            const subject = extractLastPart(result.subject.value);  // Extraire la dernière partie de l'URI du sujet
+            const predicate = result.predicate.value;
+            const object = extractLastPart(result.object.value);  // Extraire la dernière partie de l'URI de l'objet
+    
+            // Ajouter le sujet au graphe si ce n'est pas déjà fait
+            if (!nodesSet.has(subject)) {
+                nodes.push({ id: subject, label: subject });
+                nodesSet.add(subject);
+            }
+    
+            // Ajouter l'objet au graphe si ce n'est pas déjà fait
+            if (!nodesSet.has(object)) {
+                nodes.push({ id: object, label: object });
+                nodesSet.add(object);
+            }
+    
+            // Ajouter une arête pour la relation entre sujet et objet
+            edges.push({ 
+                 source: subject, 
+                 target: object, 
+                 label: predicate.split('/').pop() // Ne garder que la dernière partie de l'URI pour le prédicat
+    });
+        });
+    
+        // D3.js code to display the graph
+        const svg = d3.select("svg");
+        const width = +svg.attr("width");
+        const height = +svg.attr("height");
+    
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(edges).id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-500))
+            .force("center", d3.forceCenter(width / 2, height / 2));
+    
+        const link = svg.append("g")
+            .selectAll(".edge")
+            .data(edges)
+            .enter().append("line")
+            .attr("class", "edge")
+            .attr("stroke", "#ccc")  // Couleur des arêtes
+            .attr("stroke-width", 1.5)
+            .attr("marker-end", "url(#arrow)"); // Ajouter une flèche à l'extrémité des arêtes
+    
+        const node = svg.append("g")
+            .selectAll(".node")
+            .data(nodes)
+            .enter().append("circle")
+            .attr("class", "node")
+            .attr("r", 10)
+            .attr("fill", "#69b3a2")  // Couleur des nœuds
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+    
+        // Ajouter les étiquettes aux nœuds
+        node.append("title")
+            .text(d => d.label);
+    
+        const edgeLabels = svg.append("g")
+            .selectAll(".edge-label")
+            .data(edges)
+            .enter().append("text")
+            .attr("class", "edge-label")
+            .attr("text-anchor", "middle")
+            .attr("fill", "#333")
+            .attr("font-size", "12px")
+            .text(d => d.label);
+    
+        // Ajouter les étiquettes aux nœuds
+        const nodeLabels = svg.append("g")
+            .selectAll(".node-label")
+            .data(nodes)
+            .enter().append("text")
+            .attr("class", "node-label")
+            .attr("text-anchor", "middle")
+            .attr("fill", "#253DA0")
+            .attr("font-size", "12px")
+            .attr("dy", -25)  // Décaler l'étiquette un peu au-dessus du nœud
+            .text(d => d.label);
+    
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+    
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+    
+            edgeLabels
+                .attr("x", d => (d.source.x + d.target.x) / 2)
+                .attr("y", d => (d.source.y + d.target.y) / 2);
+    
+            nodeLabels
+                .attr("x", d => d.x)
+                .attr("y", d => d.y);
+        });
+    
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+    
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+    
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    
+        // Définir un marqueur pour la flèche sur les arêtes
+        svg.append("defs").append("marker")
+            .attr("id", "arrow")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 25)
+            .attr("refY", 0)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#ff5733");  
+    </script>
+    
+{% endif %}
+
 </body>
 
 </html>
